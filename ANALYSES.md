@@ -14,7 +14,18 @@ As a specimen of the words that intermediate learners might know, I have selecte
 from _Familia Romana_ of _Lingua Latina pe se Illustrata_
 and also the [DCC Latin core vocabulary](https://dcc.dickinson.edu/latin-core-list1) list.
 
-| Syntax      | Description |
-| ----------- | ----------- |
-| Header      | Title       |
-| Paragraph   | Text        |
+For theology I have chosen Anselm's _Proslogion_ because (as an intermediate learner) I found
+it so accessible that part of my initial motivation for building riglib was the desire to assess the
+difficulty of other works relative to it. To this I have added _De Gratia et Libero Arbitrio_
+and _Retractiones_ (Augustine), and _De Carne Christi_ (Tertullian).
+
+| Work                          | RS   |
+| ----------------------------- | ---- |
+| Familia Romana                | 2323 |
+| DCC Core List                 | 1814 |
+| **Theology**                  |      |
+| Proslogion                    | 1399 |
+| De Gratia et Libero Arbitrio  | 2020 |
+| Retractiones                  | 3781 |
+| Confessiones                  | 8492 |
+| **Classical**                 |      |
