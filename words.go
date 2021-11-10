@@ -86,6 +86,7 @@ func (w whitword) String() string {
 type stateFn func(*scannand) stateFn
 
 type scannand struct {
+	original     string
 	input        []string // whitaker definition lines
 	pos          int
 	whitpart     *whitSpeechPart // whitaker word type of last line (if any)
@@ -104,16 +105,17 @@ func formwalk(sc *scannand) stateFn {
 		sc.pos++
 		return formwalk
 	}
-	if matches := regexp.MustCompile(`([a-z]+)\s+==+`).FindStringSubmatch(l); len(matches) == 2 {
+	if matches := regexp.MustCompile(`([A-Za-z]+)\s+==+`).FindStringSubmatch(l); len(matches) == 2 {
 		sc.unknownwords = append(sc.unknownwords, matches[1])
 		sc.pos++
 		return formwalk
 	}
-	pattern := fmt.Sprintf(`([a-z,\.\(\)\- ]+)\s+(%s)`, strings.Join(whitspeechparts, "|"))
+	pattern := fmt.Sprintf(`(^[A-Za-z,\.\(\)\- ]+)(?:\s+)?(%s)(?:\A|\z|\s)`, strings.Join(whitspeechparts, "|"))
 	re := regexp.MustCompile(pattern)
 	matches := re.FindStringSubmatch(l)
 	if len(matches) == 3 {
 		if wp, ok := whitnamesinv[matches[2]]; ok {
+			prevprevinfl := sc.previnfl
 			sc.previnfl = strings.TrimSpace(strings.ReplaceAll(matches[1], ".", ""))
 			if sc.whitpart == nil {
 				sc.whitpart = &wp
@@ -121,6 +123,11 @@ func formwalk(sc *scannand) stateFn {
 				return formwalk
 			}
 			if *sc.whitpart != wp {
+				// tackon fix
+				if strings.Contains(sc.previnfl, "TACKON") {
+					sc.previnfl = prevprevinfl
+					wp = *sc.whitpart
+				}
 				// when there's a transition l is an inflection line
 				sc.words = append(sc.words, whitword{
 					inflection: sc.previnfl,
@@ -150,14 +157,18 @@ func formwalk(sc *scannand) stateFn {
 			sc.pos++
 			return formwalk
 		}
-		ignored := []string{"syncop", "word mod", "an internal", "an initial", "two words", "may be"}
+		ignored := []string{
+			"syncop", "word mod", "an internal", "an initial",
+			"two words", "may be", "slur", "bad roman numeral",
+			"it is very", "a terminal",
+		}
 		for _, s := range ignored {
 			if strings.Contains(strings.ToLower(l), s) {
 				sc.pos++
 				return formwalk
 			}
 		}
-		panic(fmt.Sprintf("Halted on line: '%s' (prev '%s'), %d\n", l, sc.previnfl, sc.pos))
+		panic(fmt.Sprintf("Halted on input '%s', line: %s\n", sc.original, l))
 	}
 
 	// we should be on English line, so set all previous unset, if necessary
@@ -171,9 +182,10 @@ func formwalk(sc *scannand) stateFn {
 	return formwalk
 }
 
-func parseword(raw string) ([]whitword, []string, error) {
+func parseword(word, raw string) ([]whitword, []string, error) {
 	lines := strings.Split(strings.TrimSpace(raw), "\n")
 	scan := &scannand{
+		original:     word,
 		input:        lines,
 		pos:          0,
 		words:        []whitword{},

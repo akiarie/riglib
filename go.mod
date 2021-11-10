@@ -1,4 +1,4 @@
-module github.com/akiarie/libvia
+module github.com/akiarie/rigorlib
 
 go 1.16
 

@@ -18,7 +18,7 @@ const (
 
 	MAX_FILES int = 20
 
-	FO_DELAY time.Duration = 1
+	FO_DELAY = time.Millisecond * 1
 )
 
 type filelock struct {
@@ -58,7 +58,7 @@ func root(word, wordsdir string, ch chan wordset, wg *sync.WaitGroup, fl *filelo
 		panic(fmt.Sprintf("%s: open files %d", err, fl.n))
 	}
 	fl.close()
-	words, unknown, err := parseword(string(out))
+	words, unknown, err := parseword(word, string(out))
 	if err != nil {
 		panic(fmt.Sprintf("Unable to parse Whitaker definition: %v\n", err))
 	}
@@ -92,6 +92,7 @@ func readwordsdir(dir string) error {
 
 func main() {
 	wordsdir := getopt.StringLong("words-dir", 'w', WORDS_DIR, "path to the words directory")
+	prunknown := getopt.BoolLong("print-unknown", 'u', "whether to print unknown words")
 	getopt.Parse()
 	args := getopt.Args()
 	if len(args) == 0 {
@@ -120,8 +121,10 @@ func main() {
 			for _, w := range ws.k {
 				fmt.Println(w.inflection)
 			}
-			for _, w := range ws.u {
-				fmt.Println("Unknown:", w)
+			if *prunknown {
+				for _, w := range ws.u {
+					fmt.Println(w)
+				}
 			}
 		}
 	}
