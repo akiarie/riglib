@@ -69,6 +69,6 @@ the number of Latin forms or word-families that the inputted work contains.
 To compare the difficulty of two texts, first pass them through riglib and store their outputs. Then
 run the following (where `[OUTPUT 1]` and `[OUTPUT 2]` as the paths to the two riglib outputs)
 ```bash
-sort [OUTPUT 1] [OUTPUT 2] | uniq -d | wc -l
+$ sort [OUTPUT 1] [OUTPUT 2] | uniq -d | wc -l
 ```
 to get a count of the intersection set of forms, the **riglib overlap**.
