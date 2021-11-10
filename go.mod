@@ -1,4 +1,4 @@
-module github.com/akiarie/rigorlib
+module github.com/akiarie/riglib
 
 go 1.16
 
