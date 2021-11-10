@@ -101,6 +101,8 @@ func main() {
 	if err := readwordsdir(*wordsdir); err != nil {
 		log.Fatalln(err)
 	}
+	unknown := []string{}
+	known := []string{}
 	for _, p := range args {
 		list, err := readlist(p)
 		if err != nil {
@@ -116,16 +118,27 @@ func main() {
 		go func() {
 			wg.Wait()
 			close(ch)
+			for _, w := range known {
+				fmt.Println(w)
+			}
 		}()
 		for ws := range ch {
 			for _, w := range ws.k {
-				fmt.Println(w.inflection)
+				known = append(known, w.inflection)
 			}
 			if *prunknown {
 				for _, w := range ws.u {
-					fmt.Println(w)
+					unknown = append(unknown, w)
 				}
 			}
 		}
+	}
+
+	outarr := known
+	if *prunknown {
+		outarr = append(outarr, unknown...)
+	}
+	for _, w := range outarr {
+		fmt.Println(w)
 	}
 }

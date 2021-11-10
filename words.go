@@ -110,7 +110,7 @@ func formwalk(sc *scannand) stateFn {
 		sc.pos++
 		return formwalk
 	}
-	pattern := fmt.Sprintf(`(^[A-Za-z,\.\(\)\- ]+)(?:\s+)?(%s)(?:\A|\z|\s)`, strings.Join(whitspeechparts, "|"))
+	pattern := fmt.Sprintf(`(^[A-Za-z,\.\(\)\- ]+)(?:\s+)(%s)(?:\A|\z|\s)`, strings.Join(whitspeechparts, "|"))
 	re := regexp.MustCompile(pattern)
 	matches := re.FindStringSubmatch(l)
 	if len(matches) == 3 {
