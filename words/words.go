@@ -1,4 +1,4 @@
-package main
+package words
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-type whitSpeechPart int
+type WhitSpeechPart int
 
 const (
 	X      = iota // all, none, or unknown
@@ -27,7 +27,7 @@ const (
 	SUFFIX        //  SUFFIX --  here artificial for code
 )
 
-var whitnames = map[whitSpeechPart]string{
+var whitnames = map[WhitSpeechPart]string{
 	X:      "X",
 	N:      "N",
 	PRON:   "PRON",
@@ -46,7 +46,7 @@ var whitnames = map[whitSpeechPart]string{
 	SUFFIX: "SUFFIX",
 }
 
-func (p whitSpeechPart) String() string {
+func (p WhitSpeechPart) String() string {
 	return whitnames[p]
 }
 
@@ -58,28 +58,28 @@ func genWhitSpeechParts() []string {
 	return arr
 }
 
-func genWhitSpeechInv() map[string]whitSpeechPart {
-	inv := make(map[string]whitSpeechPart)
+func genWhitSpeechInv() map[string]WhitSpeechPart {
+	inv := make(map[string]WhitSpeechPart)
 	for k, v := range whitnames {
 		inv[v] = k
 	}
 	return inv
 }
 
-var whitspeechparts = genWhitSpeechParts()
+var WhitSpeechParts = genWhitSpeechParts()
 var whitnamesinv = genWhitSpeechInv()
 
-type whitword struct {
-	inflection string
+type Whitword struct {
+	Inflection string
 	english    []string
-	part       whitSpeechPart
+	part       WhitSpeechPart
 }
 
-func (w whitword) String() string {
+func (w Whitword) String() string {
 	if len(w.english) > 0 {
-		return fmt.Sprintf("{%s, inflection: '%s', english: %v}", w.part, w.inflection, w.english)
+		return fmt.Sprintf("{%s, Inflection: '%s', english: %v}", w.part, w.Inflection, w.english)
 	} else {
-		return fmt.Sprintf("{%s, inflection: '%s'}", w.part, w.inflection)
+		return fmt.Sprintf("{%s, Inflection: '%s'}", w.part, w.Inflection)
 	}
 }
 
@@ -89,9 +89,9 @@ type scannand struct {
 	original     string
 	input        []string // whitaker definition lines
 	pos          int
-	whitpart     *whitSpeechPart // whitaker word type of last line (if any)
+	whitpart     *WhitSpeechPart // whitaker word type of last line (if any)
 	previnfl     string
-	words        []whitword // parsed words
+	words        []Whitword // parsed words
 	unknownwords []string
 }
 
@@ -110,7 +110,7 @@ func formwalk(sc *scannand) stateFn {
 		sc.pos++
 		return formwalk
 	}
-	pattern := fmt.Sprintf(`(^[A-Za-z,\.\(\)\- ]+)(?:\s+)(%s)(?:\A|\z|\s)`, strings.Join(whitspeechparts, "|"))
+	pattern := fmt.Sprintf(`(^[A-Za-z,\.\(\)\- ]+)(?:\s+)(%s)(?:\A|\z|\s)`, strings.Join(WhitSpeechParts, "|"))
 	re := regexp.MustCompile(pattern)
 	matches := re.FindStringSubmatch(l)
 	if len(matches) == 3 {
@@ -128,9 +128,9 @@ func formwalk(sc *scannand) stateFn {
 					sc.previnfl = prevprevinfl
 					wp = *sc.whitpart
 				}
-				// when there's a transition l is an inflection line
-				sc.words = append(sc.words, whitword{
-					inflection: sc.previnfl,
+				// when there's a transition l is an Inflection line
+				sc.words = append(sc.words, Whitword{
+					Inflection: sc.previnfl,
 					part:       wp,
 				})
 				sc.whitpart = nil
@@ -172,8 +172,8 @@ func formwalk(sc *scannand) stateFn {
 	}
 
 	// we should be on English line, so set all previous unset, if necessary
-	sc.words = append(sc.words, whitword{
-		inflection: sc.previnfl,
+	sc.words = append(sc.words, Whitword{
+		Inflection: sc.previnfl,
 		english:    []string{l},
 		part:       *sc.whitpart,
 	})
@@ -182,13 +182,13 @@ func formwalk(sc *scannand) stateFn {
 	return formwalk
 }
 
-func parseword(word, raw string) ([]whitword, []string, error) {
+func Parseword(word, raw string) ([]Whitword, []string, error) {
 	lines := strings.Split(strings.TrimSpace(raw), "\n")
 	scan := &scannand{
 		original:     word,
 		input:        lines,
 		pos:          0,
-		words:        []whitword{},
+		words:        []Whitword{},
 		unknownwords: []string{},
 	}
 	for st := formwalk(scan); st != nil; st = st(scan) {

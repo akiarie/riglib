@@ -35,6 +35,8 @@ $ riglib [FILE 1] [FILE 2] [FILE 3] ...
 ```
 where `[FILE 1]`, `[FILE 2]`, `[FILE 3]`, etc. are the files to be analysed.
 
+## Printing unknown words.
+
 riglib ignores unknown words, thereby elminating anything which Whitaker's words does not consider
 to be Latin. This is advantageous when working with large files and there is no time to filter out
 non-Latin words, but may be a problem for well-transcribed documents. There is therefore the
@@ -48,7 +50,7 @@ $ riglib --print-unknown [FILE]
 ```
 for situations where one desires to retain all the input words.
 
-# Interpreting riglib's output.
+## Interpreting riglib's output.
 
 For the sake of efficiency, riglib does not bother to sort its output, nor does it avoid repeat
 outputs. Thus to obtain a word-count one will regularly use
@@ -57,12 +59,8 @@ $ riglib [FILE] | sort | uniq | wc -l
 ```
 or something of the like.
 
-
-## Obtaining a riglib score.
-
 This figure, which we may name the **riglib score**, gives one a very accurate estimate regarding
 the number of Latin forms or word-families that the inputted work contains.
-
 
 ## Comparing two texts
 
@@ -72,3 +70,19 @@ run the following (where `[OUTPUT 1]` and `[OUTPUT 2]` as the paths to the two r
 $ sort [OUTPUT 1] [OUTPUT 2] | uniq -d | wc -l
 ```
 to get a count of the intersection set of forms, the **riglib overlap**.
+
+
+## Obtaining known-word density.
+
+The **known-word density (KWD)** is perhaps more important than the RO for assessing how difficult
+moving from one text to another. It is obtained by typing
+```bash
+$ riglib -c [DICT FILE] [WORD LIST]
+Included: 5904, Total: 6307, Coverage: 0.94, Unknown: 58, Known coverage: 0.94
+```
+where `[DICT FILE]` is the sorted, unique output of riglib operating on the understood wordlist, and
+`[WORD LIST]` is produced with
+```bash
+$ cat [BOOK FILE] | tr ' ' '\n' | tr -cd '[:alpha:]\n' | tr '[:upper:]' '[:lower:]' | sort > [WORD LIST]
+```
+with `[BOOK FILE]` being the work under consideration.
