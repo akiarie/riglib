@@ -6,9 +6,9 @@ _A tool for analysing words in a text to assess the difficulty of (Latin) books.
 _riglib_ is short for _rigor librī_, and therefore functions as a tool for assessing the difficulty
 of a Latin work, to facilitate the learner in charting out a route of works to read in sequence.
 
-It works by feeding in each input line into [Whitaker's
-words](http://archives.nd.edu/whitaker/words.htm) and then selecting all the word-forms in the
-inflection lines it outputs. 
+It works by feeding in each input line into 
+[Whitaker's words](http://archives.nd.edu/whitaker/words.htm)
+and selecting all the word-forms in the inflection lines it outputs. 
 
 To get an idea of the kind of analysis that it can produce, see [this document](ANALYSES.md).
 
@@ -31,7 +31,7 @@ to the pipeline above, prior to the command to strip non-alpha characters.
 
 To use the tool, simply type
 ```bash
-$ riglib [FILE 1] [FILE 2] [FILE 3] ...
+$ riglib [FILE 1] [FILE 2] [FILE 3] # etc.
 ```
 where `[FILE 1]`, `[FILE 2]`, `[FILE 3]`, etc. are the files to be analysed.
 
@@ -59,26 +59,29 @@ $ riglib [FILE] | sort | uniq | wc -l
 ```
 or something of the like.
 
-This figure, which we may name the **riglib score**, gives one a very accurate estimate regarding
-the number of Latin forms or word-families that the inputted work contains.
+This figure, which we may name the **riglib score (RS)**, gives one a very accurate estimate
+regarding the number of Latin forms or word-families that the inputted work contains.
 
-## Comparing two texts
+## Comparing two texts.
 
 To compare the difficulty of two texts, first pass them through riglib and store their outputs. Then
 run the following (where `[OUTPUT 1]` and `[OUTPUT 2]` as the paths to the two riglib outputs)
 ```bash
 $ sort [OUTPUT 1] [OUTPUT 2] | uniq -d | wc -l
 ```
-to get a count of the intersection set of forms, the **riglib overlap**.
+to get a count of the intersection set of forms, the **riglib overlap (RO)**.
 
 
 ## Obtaining known-word density.
 
 The **known-word density (KWD)** is perhaps more important than the RO for assessing how difficult
-moving from one text to another. It is obtained by typing
+moving from an accessbile text to another one. It is obtained by typing
 ```bash
 $ riglib -c [DICT FILE] [WORD LIST]
-Included: 5904, Total: 6307, Coverage: 0.94, Unknown: 58, Known coverage: 0.94
+```
+or
+```bash
+$ riglib --word-coverage [DICT FILE] [WORD LIST]
 ```
 where `[DICT FILE]` is the sorted, unique output of riglib operating on the understood wordlist, and
 `[WORD LIST]` is produced with
@@ -86,3 +89,13 @@ where `[DICT FILE]` is the sorted, unique output of riglib operating on the unde
 $ cat [BOOK FILE] | tr ' ' '\n' | tr -cd '[:alpha:]\n' | tr '[:upper:]' '[:lower:]' | sort > [WORD LIST]
 ```
 with `[BOOK FILE]` being the work under consideration.
+
+The output will be something like
+```bash
+Included: 5904, Total: 6307, Coverage: 0.94, Unknown: 58, Known coverage: 0.94 # exemplary figures
+```
+- _Included_: The number of word-forms found in `[BOOK FILE]` that are in `[DICT FILE]`
+- _Total_: The total words in `[BOOK FILE]`
+- _Coverage_: The ratio _Included_ / _Total_
+- _Unknown_: The number of word-forms found in `[BOOK FILE]` that Whitaker's words couldn't identify
+- _Known coverage_: The ratio _Included_ / (_Total_ – _Unknown_), the **KWD**.
