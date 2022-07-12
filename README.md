@@ -1,6 +1,8 @@
 # riglib.
 _A tool for analysing words in a text to assess the difficulty of (Latin) books._
 
+(This is all WIP.)
+
 # Overview.
 
 _riglib_ is short for _rigor librī_, and therefore functions as a tool for assessing the difficulty
